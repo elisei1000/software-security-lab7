@@ -40,6 +40,7 @@ void __log(file_logger *this, const char *message, int level) {
     timeStr[strlen(timeStr) - 2] = '\0';
 
     fprintf(this->file, "[%s].%s : %s\n", timeStr, level_to_str(level), message);
+    fflush(this->file);
 }
 
 void debug(file_logger *this, const char *message) {

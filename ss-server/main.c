@@ -59,7 +59,7 @@ void serve_client(int c) {
 
     memset(path, '\0', MAX_PATH_SIZE * sizeof(char));
     recv(c, path, pathSize * sizeof(char), MSG_WAITALL);
-    snprintf(msg, MAX_MSG, "Received path %s", path);
+    snprintf(msg, MAX_MSG, "Received path '%s'", path);
     debug(logger, msg);
     FILE *fp = open_if_valid(path);
 
@@ -70,11 +70,18 @@ void serve_client(int c) {
 
         snprintf(msg, MAX_MSG, "Packet's %d real size: %d", i, realSize);
         debug(logger, msg);
+        if (realSize > 0) {
+            memset(packet, '\0', MAX_PACKET_SIZE * sizeof(char));
+            recv(c, packet, realSize * sizeof(char), MSG_WAITALL);
+            snprintf(msg, MAX_MSG, "Packet %d = '%s'", i, packet);
+            debug(logger, msg);
 
-        memset(packet, '\0', MAX_PACKET_SIZE * sizeof(char));
-        recv(c, packet, MAX_PACKET_SIZE * sizeof(char), MSG_WAITALL);
-        snprintf(msg, MAX_MSG, "Packet %d = %s", i, packet);
-        write_packet(fp, packet, realSize);
+            write_packet(fp, packet, realSize);
+        } else {
+            snprintf(msg, MAX_MSG, "Packet size is 0, proceeding...");
+            debug(logger, msg);
+        }
+
     }
 
     if (is_path_valid(packet)) {
@@ -86,9 +93,6 @@ void serve_client(int c) {
     uint32_t responseSize = (uint32_t) strlen(msg);
     send(c, &responseSize, sizeof(responseSize), 0);
     send(c, msg, responseSize, 0);
-
-    snprintf(msg, MAX_MSG, "Sent response '%s' with size %d ", msg, responseSize);
-    info(logger, msg);
 
     if (fp != NULL) {
         snprintf(msg, MAX_MSG, "Closed file handle.");
