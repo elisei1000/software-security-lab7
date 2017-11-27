@@ -7,27 +7,57 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include "logger.h"
 
 file_logger *logger;
 
-const int MAX_PATH_SIZE = 261;
+const int MAX_PATH_SIZE = 260;
 const int MAX_PACKET_SIZE = 1024 * 1024;
 const int MAX_MSG = 1000;
+const char *restrincted_file_names = {
+        ""
+};
+
+void *to_lower(char *p) {
+    if (*p) {
+        tolower(*p);
+        to_lower(++p);
+    }
+}
 
 bool is_path_valid(const char *path) {
-    if (strstr(path, ".") && strlen(path) <= MAX_PATH_SIZE) {
+    size_t path_len = strlen(path);
+    if (path_len > MAX_PATH_SIZE && path_len <= 2) {
         return false;
     }
 
-    return true;
+    char *lower_path = malloc((path_len + 1) * sizeof(char));
+    bool is_valid = true;
+    strcpy(lower_path, path);
+    info(logger, path);
+    info(logger, lower_path);
+    to_lower(lower_path);
+
+    for (size_t i = 0; i < path_len - 1; ++i) {
+        if (path[i] == '.' && path[i + 1] == '.') {
+            // tying to access parent directory
+            is_valid = false;
+            break;
+        }
+    }
+
+    free(lower_path);
+    return is_valid;
 }
 
 FILE *open_if_valid(const char *path) {
     if (is_path_valid(path)) {
+        debug(logger, "File path is valid, opening file.");
         return fopen(path, "a");
     }
 
+    debug(logger, "File path is invalid.");
     return NULL;
 }
 
@@ -53,8 +83,10 @@ void serve_client(int c) {
     info(logger, msg);
 
     recv(c, &pathSize, sizeof(pathSize), MSG_WAITALL);
+    snprintf(msg, MAX_MSG, "Path length before conversion: %d", pathSize);
+    info(logger, msg);
     packetsCount = ntohl(packetsCount);
-    snprintf(msg, MAX_MSG, "Path length: %d", pathSize);
+    snprintf(msg, MAX_MSG, "Path length after conversion: %d", pathSize);
     info(logger, msg);
 
     memset(path, '\0', MAX_PATH_SIZE * sizeof(char));
@@ -66,6 +98,8 @@ void serve_client(int c) {
     for (int i = 0; i < packetsCount; i++) {
         uint32_t realSize = 0;
         recv(c, &realSize, sizeof(realSize), MSG_WAITALL);
+        snprintf(msg, MAX_MSG, "Packet's %d size before conversion: %d", i, realSize);
+        debug(logger, msg);
         realSize = ntohl(realSize);
 
         snprintf(msg, MAX_MSG, "Packet's %d real size: %d", i, realSize);
@@ -120,6 +154,7 @@ int main(int argc, char *argv[]) {
     logger = new_logger("server.log");
 
     signal(SIGINT, int_handler);
+    signal(SIGTERM, int_handler);
 
     info(logger, "Created the logger");
 
@@ -135,7 +170,7 @@ int main(int argc, char *argv[]) {
         debug(logger, msg);
     }
 
-    uint16_t port = 6666;
+    uint16_t port = 1024;
     if (argc > 1) {
         uint16_t newPort = (uint16_t) atoi(argv[1]);
         snprintf(msg, MAX_MSG, "Converted %s to %d", argv[1], newPort);
