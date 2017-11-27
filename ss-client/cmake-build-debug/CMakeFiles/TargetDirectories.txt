@@ -1,0 +1,3 @@
+/home/elisei/Drive/facultate/an_3/sem_1/ss/laborator/lab07-serverClient/software-security-lab7/ss-client/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/elisei/Drive/facultate/an_3/sem_1/ss/laborator/lab07-serverClient/software-security-lab7/ss-client/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/elisei/Drive/facultate/an_3/sem_1/ss/laborator/lab07-serverClient/software-security-lab7/ss-client/cmake-build-debug/CMakeFiles/ss_client.dir
