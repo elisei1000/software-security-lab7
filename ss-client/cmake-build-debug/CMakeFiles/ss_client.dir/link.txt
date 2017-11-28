@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/ss_client.dir/main.cpp.o  -o ss_client 
