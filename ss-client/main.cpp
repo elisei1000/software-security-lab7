@@ -19,11 +19,12 @@ int reserved_files_number = 22;
 uint16_t  server_port = 1024;
 
 const char * server_address = "127.0.0.1";
-char  firstPacket[271];
+char  firstPacket[271], file_packet[1024*1024 + 4], message[256];
+const size_t MESSAGE_LENGTH = 256;
 const size_t MAX_PATH = 260;
 const int FIRST_PACKET_SIZE = 271;
-const int FILE_PART_SIZE = 1024 * 1024;
-const size_t PACKET_SIZE = 1024 * 1024 + 4;
+const uint32_t FILE_PART_SIZE = 1024 * 1024;
+const uint32_t PACKET_SIZE = 1024 * 1024 + 4;
 
 void toLower(char * p){
     char *ch;
@@ -52,7 +53,8 @@ bool is_valid_path(char * path){
 int main(int argc , char ** argv) {
     char *path;
     int client_socket;
-    int packet_number, path_len, input_fd;
+    int input_fd, translated;
+    uint32_t path_len, packet_number;
     struct hostent *server;
     struct sockaddr_in serv_addr;
     struct stat buffer;
@@ -102,10 +104,11 @@ int main(int argc , char ** argv) {
     cout<<"Sending file "<< path <<" of size " << buffer.st_size<<"\n";
 
     path_len = static_cast<int>(strlen(path)); // am verificat ca path-ul nu e mai lung de 260
-    packet_number = ((int)buffer.st_size) / FILE_PART_SIZE + 1;
-
-    memcpy(firstPacket, &packet_number, 4);
-    memcpy(firstPacket+4, &path_len, 4);
+    packet_number = ((uint32_t)buffer.st_size) / FILE_PART_SIZE + 1;
+    translated = htonl(packet_number);
+    memcpy(firstPacket, &translated, 4);
+    translated = htonl(path_len);
+    memcpy(firstPacket+4, &translated, 4);
     memcpy(firstPacket+8, path, 261);
 
     input_fd = open(path, O_RDONLY);
@@ -119,6 +122,67 @@ int main(int argc , char ** argv) {
         perror("Can't send first packet to server:");
         return 0;
     }
+
+
+    cout<<"Sending packets...\n";
+
+    for(int i=0;i < packet_number; i++){
+        cout<<"Sending packet #"<<i<<"\n";
+
+        uint32_t bytesRead = 0;
+        while(true)
+        {
+            ssize_t nr = read(input_fd, file_packet + 4 + bytesRead, FILE_PART_SIZE - bytesRead);
+            if(nr == -1){
+                perror("Failed to read file: ");
+                return 0;
+            }
+            if(nr == 0)
+                break;
+            bytesRead += nr;
+            if(bytesRead == FILE_PART_SIZE)
+                break;
+        }
+
+        translated = htonl(bytesRead);
+        memcpy(file_packet, &translated, 4);
+        if(write(client_socket, file_packet, PACKET_SIZE) != PACKET_SIZE){
+            perror("Can't send file packet to server:");
+            return 0;
+        }
+    }
+
+
+    uint32_t message_length = 0;
+    if(read(client_socket, &message_length, 4) != 4){
+        perror("Can't receive message!");
+        return 0;
+    }
+    message_length = ntohl(message_length);
+    cout<<"Message length: " << message_length;
+    uint32_t bytesRead = 0, totalReadBytes = 0;
+    while(true)
+    {
+        ssize_t nr = read(client_socket, message, MESSAGE_LENGTH - bytesRead - 1);
+        if(nr == -1){
+            perror("Failed to read message: ");
+            return 0;
+        }
+        if(nr == 0)
+            break;
+        bytesRead += nr;
+        if(bytesRead == MESSAGE_LENGTH - 1){
+            message[MESSAGE_LENGTH - 1] = 0;
+            cout<<message;
+            bytesRead = 0;
+            totalReadBytes += nr;
+        }
+        if(totalReadBytes == message_length){
+            break;
+        }
+    }
+
+
 
 
     return 0;
