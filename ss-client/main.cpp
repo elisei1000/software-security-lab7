@@ -16,7 +16,7 @@ const char  *reserved_files[] = {"con", "prn", "aux", "nul", "com1", "com2", "co
                           "com6", "com7", "com8", "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5",
                           "lpt6", "lpt7", "lpt8", "lpt9"};
 int reserved_files_number = 22;
-uint16_t  server_port = 1024;
+uint16_t  server_port = 1027;
 
 const char * server_address = "127.0.0.1";
 char  firstPacket[271], file_packet[1024*1024 + 4], message[256];
@@ -53,7 +53,8 @@ bool is_valid_path(char * path){
 int main(int argc , char ** argv) {
     char *path;
     int client_socket;
-    int input_fd, translated;
+    int input_fd;
+    uint32_t translated;
     uint32_t path_len, packet_number;
     struct hostent *server;
     struct sockaddr_in serv_addr;
@@ -118,7 +119,7 @@ int main(int argc , char ** argv) {
     }
 
     cout<<"Sending first packet\n";
-    if(write(client_socket, firstPacket, FIRST_PACKET_SIZE) != FIRST_PACKET_SIZE){
+    if(send(client_socket, firstPacket, FIRST_PACKET_SIZE, 0) != FIRST_PACKET_SIZE){
         perror("Can't send first packet to server:");
         return 0;
     }
@@ -146,7 +147,7 @@ int main(int argc , char ** argv) {
 
         translated = htonl(bytesRead);
         memcpy(file_packet, &translated, 4);
-        if(write(client_socket, file_packet, PACKET_SIZE) != PACKET_SIZE){
+        if(send(client_socket, file_packet, PACKET_SIZE, 0) != PACKET_SIZE){
             perror("Can't send file packet to server:");
             return 0;
         }
@@ -154,7 +155,7 @@ int main(int argc , char ** argv) {
 
 
     uint32_t message_length = 0;
-    if(read(client_socket, &message_length, 4) != 4){
+    if(recv(client_socket, &message_length, 4, MSG_WAITALL) != 4){
         perror("Can't receive message!");
         return 0;
     }
@@ -163,7 +164,7 @@ int main(int argc , char ** argv) {
     uint32_t bytesRead = 0, totalReadBytes = 0;
     while(true)
     {
-        ssize_t nr = read(client_socket, message, MESSAGE_LENGTH - bytesRead - 1);
+        ssize_t nr = recv(client_socket, message, MESSAGE_LENGTH - bytesRead - 1, MSG_WAITALL);
         if(nr == -1){
             perror("Failed to read message: ");
             return 0;
