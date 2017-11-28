@@ -125,6 +125,7 @@ void serve_client(int c) {
     }
 
     uint32_t responseSize = (uint32_t) strlen(msg);
+    responseSize = htonl(responseSize);
     send(c, &responseSize, sizeof(responseSize), 0);
     send(c, msg, responseSize, 0);
 
