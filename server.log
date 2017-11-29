@@ -1,0 +1,94 @@
+[Wed Nov 29 01:48:25 201].INFO : Created the logger
+[Wed Nov 29 01:48:25 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 01:48:25 201].DEBUG : arg[1] = 1024
+[Wed Nov 29 01:48:25 201].DEBUG : Converted 1024 to 1024
+[Wed Nov 29 01:48:25 201].INFO : Listening for connections on port 1024
+[Wed Nov 29 01:49:24 201].INFO : Ctrl-C detected...exiting now.
+[Wed Nov 29 01:49:26 201].INFO : Created the logger
+[Wed Nov 29 01:49:26 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 01:49:26 201].DEBUG : arg[1] = 1027
+[Wed Nov 29 01:49:26 201].DEBUG : Converted 1027 to 1027
+[Wed Nov 29 01:49:26 201].INFO : Listening for connections on port 1027
+[Wed Nov 29 01:49:30 201].INFO : Connection accepted by server from 127.0.0.1.
+[Wed Nov 29 01:49:30 201].INFO : Packets count: 16777216
+[Wed Nov 29 01:49:30 201].INFO : Path length before conversion: 184549376
+[Wed Nov 29 01:49:30 201].INFO : Path length after conversion: 184549376
+[Wed Nov 29 01:49:47 201].INFO : Ctrl-C detected...exiting now.
+[Wed Nov 29 01:49:47 201].INFO : Ctrl-C detected...exiting now.
+[Wed Nov 29 01:57:05 201].INFO : Created the logger
+[Wed Nov 29 01:57:05 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 01:57:05 201].DEBUG : arg[1] = 1027
+[Wed Nov 29 01:57:05 201].DEBUG : Converted 1027 to 1027
+[Wed Nov 29 01:57:05 201].INFO : Listening for connections on port 1027
+[Wed Nov 29 01:57:10 201].INFO : Connection accepted by server from 127.0.0.1.
+[Wed Nov 29 01:57:10 201].INFO : Packets count: 16777216
+[Wed Nov 29 01:57:10 201].INFO : Path length before conversion: 184549376
+[Wed Nov 29 01:57:10 201].INFO : Path length after conversion: 184549376
+[Wed Nov 29 01:57:47 201].INFO : Ctrl-C detected...exiting now.
+[Wed Nov 29 01:57:47 201].INFO : Ctrl-C detected...exiting now.
+[Wed Nov 29 01:59:03 201].INFO : Created the logger
+[Wed Nov 29 01:59:03 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 01:59:03 201].DEBUG : arg[1] = 1027
+[Wed Nov 29 01:59:03 201].DEBUG : Converted 1027 to 1027
+[Wed Nov 29 01:59:03 201].INFO : Listening for connections on port 1027
+[Wed Nov 29 01:59:05 201].INFO : Connection accepted by server from 127.0.0.1.
+[Wed Nov 29 01:59:05 201].INFO : Packets count: 16777216
+[Wed Nov 29 01:59:05 201].INFO : Path length before conversion: 184549376
+[Wed Nov 29 01:59:05 201].INFO : Path length after conversion: 184549376
+[Wed Nov 29 02:00:47 201].INFO : Ctrl-C detected...exiting now.
+[Wed Nov 29 02:00:47 201].INFO : Ctrl-C detected...exiting now.
+[Wed Nov 29 02:00:49 201].INFO : Created the logger
+[Wed Nov 29 02:00:49 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 02:00:49 201].DEBUG : arg[1] = 1027
+[Wed Nov 29 02:00:49 201].DEBUG : Converted 1027 to 1027
+[Wed Nov 29 02:00:49 201].ERROR : Error when trying to bind: Address already in use
+[Wed Nov 29 02:00:55 201].INFO : Created the logger
+[Wed Nov 29 02:00:55 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 02:00:55 201].DEBUG : arg[1] = 1027
+[Wed Nov 29 02:00:55 201].DEBUG : Converted 1027 to 1027
+[Wed Nov 29 02:00:55 201].ERROR : Error when trying to bind: Address already in use
+[Wed Nov 29 02:01:03 201].INFO : Created the logger
+[Wed Nov 29 02:01:03 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 02:01:03 201].DEBUG : arg[1] = 1027
+[Wed Nov 29 02:01:03 201].DEBUG : Converted 1027 to 1027
+[Wed Nov 29 02:01:03 201].ERROR : Error when trying to bind: Address already in use
+[Wed Nov 29 02:01:06 201].INFO : Created the logger
+[Wed Nov 29 02:01:06 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 02:01:06 201].DEBUG : arg[1] = 1025
+[Wed Nov 29 02:01:06 201].DEBUG : Converted 1025 to 1025
+[Wed Nov 29 02:01:06 201].INFO : Listening for connections on port 1025
+[Wed Nov 29 02:01:27 201].INFO : Ctrl-C detected...exiting now.
+[Wed Nov 29 02:01:28 201].INFO : Created the logger
+[Wed Nov 29 02:01:28 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 02:01:28 201].DEBUG : arg[1] = 1027
+[Wed Nov 29 02:01:28 201].DEBUG : Converted 1027 to 1027
+[Wed Nov 29 02:01:28 201].ERROR : Error when trying to bind: Address already in use
+[Wed Nov 29 02:01:59 201].INFO : Created the logger
+[Wed Nov 29 02:01:59 201].DEBUG : arg[0] = ./ss-server/cmake-build-debug/ss_server
+[Wed Nov 29 02:01:59 201].DEBUG : arg[1] = 1026
+[Wed Nov 29 02:01:59 201].DEBUG : Converted 1026 to 1026
+[Wed Nov 29 02:01:59 201].INFO : Listening for connections on port 1026
+[Wed Nov 29 02:02:03 201].INFO : Connection accepted by server from 127.0.0.1.
+[Wed Nov 29 02:02:03 201].INFO : Packets count: 16777216 -> 1
+[Wed Nov 29 02:02:03 201].INFO : Path length before conversion: 184549376
+[Wed Nov 29 02:02:03 201].INFO : Path length after conversion: 11
+[Wed Nov 29 02:02:03 201].DEBUG : Received path 'TeEttTT.txt'
+[Wed Nov 29 02:02:03 201].INFO : TeEttTT.txt
+[Wed Nov 29 02:02:03 201].INFO : TeEttTT.txt
+[Wed Nov 29 02:02:03 201].DEBUG : File path is valid, opening file.
+[Wed Nov 29 02:02:03 201].DEBUG : Packet's 0 size before conversion: 1598245888
+[Wed Nov 29 02:02:03 201].DEBUG : Packet's 0 real size: 4997983
+[Wed Nov 29 02:02:32 201].DEBUG : Packet 0 = 'PAPER=ro_RO.UTF-8'
+[Wed Nov 29 02:02:32 201].INFO : PAPER=ro_RO.UTF-8
+[Wed Nov 29 02:02:32 201].INFO : PAPER=ro_RO.UTF-8
+[Wed Nov 29 02:03:35 201].INFO : Connection accepted by server from 127.0.0.1.
+[Wed Nov 29 02:03:35 201].INFO : Packets count: 33554432 -> 2
+[Wed Nov 29 02:03:35 201].INFO : Path length before conversion: 184549376
+[Wed Nov 29 02:03:35 201].INFO : Path length after conversion: 11
+[Wed Nov 29 02:03:35 201].DEBUG : Received path 'TeEttTT.txt'
+[Wed Nov 29 02:03:35 201].INFO : TeEttTT.txt
+[Wed Nov 29 02:03:35 201].INFO : TeEttTT.txt
+[Wed Nov 29 02:03:35 201].DEBUG : File path is valid, opening file.
+[Wed Nov 29 02:03:35 201].DEBUG : Packet's 0 size before conversion: 1598245888
+[Wed Nov 29 02:03:35 201].DEBUG : Packet's 0 real size: 4997983
+[Wed Nov 29 02:06:04 201].INFO : Ctrl-C detected...exiting now.
