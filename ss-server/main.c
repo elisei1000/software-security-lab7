@@ -78,14 +78,15 @@ void serve_client(int c) {
 
 
     recv(c, &packetsCount, sizeof(packetsCount), MSG_WAITALL);
-    snprintf(msg, MAX_MSG, "Packets count: %d", packetsCount);
+    snprintf(msg, MAX_MSG, "Packets count: %d -> %d", packetsCount, ntohl(packetsCount));
+
     packetsCount = ntohl(packetsCount);
     info(logger, msg);
 
     recv(c, &pathSize, sizeof(pathSize), MSG_WAITALL);
     snprintf(msg, MAX_MSG, "Path length before conversion: %d", pathSize);
     info(logger, msg);
-    packetsCount = ntohl(packetsCount);
+    pathSize = ntohl(pathSize);
     snprintf(msg, MAX_MSG, "Path length after conversion: %d", pathSize);
     info(logger, msg);
 
@@ -118,16 +119,18 @@ void serve_client(int c) {
 
     }
 
-    if (is_path_valid(packet)) {
+    if (!is_path_valid(packet)) {
         snprintf(msg, MAX_MSG, "Error: Path \"%s\" is invalid", path);
     } else {
         snprintf(msg, MAX_MSG, "Success");
     }
 
-    uint32_t responseSize = (uint32_t) strlen(msg);
-    responseSize = htonl(responseSize);
-    send(c, &responseSize, sizeof(responseSize), 0);
-    send(c, msg, responseSize, 0);
+    uint32_t response_size = (uint32_t) strlen(msg);
+    printf("Sending response size %d -> %d\n", response_size, htonl(response_size));
+    response_size = htonl(response_size);
+    send(c, &response_size, sizeof(response_size), 0);
+    send(c, msg, response_size, 0);
+    printf("Sent message to client: %s\n", msg);
 
     if (fp != NULL) {
         snprintf(msg, MAX_MSG, "Closed file handle.");
@@ -148,7 +151,7 @@ void int_handler(int signal) {
 }
 
 int main(int argc, char *argv[]) {
-    int s, c;
+    int sockfd, c;
     socklen_t len;
     char msg[MAX_MSG];
     struct sockaddr_in server, client;
@@ -159,12 +162,15 @@ int main(int argc, char *argv[]) {
 
     info(logger, "Created the logger");
 
-    s = socket(AF_INET, SOCK_STREAM, 0);
-    if (s < 0) {
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
         snprintf(msg, MAX_MSG, "Could not create the server socket: %s", strerror(errno));
         error(logger, msg);
         return 1;
     }
+    int enable = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+        error(logger, "setsockopt(SO_REUSEADDR) failed");
 
     for (int i = 0; i < argc; i++) {
         snprintf(msg, MAX_MSG, "arg[%d] = %s", i, argv[i]);
@@ -186,7 +192,7 @@ int main(int argc, char *argv[]) {
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind(s, (struct sockaddr *) &server, sizeof(server))) {
+    if (bind(sockfd, (struct sockaddr *) &server, sizeof(server))) {
         snprintf(msg, MAX_MSG, "Error when trying to bind: %s", strerror(errno));
         error(logger, msg);
         return 1;
@@ -194,13 +200,13 @@ int main(int argc, char *argv[]) {
     snprintf(msg, MAX_MSG, "Listening for connections on port %d", port);
     info(logger, msg);
 
-    listen(s, 5);
+    listen(sockfd, 5);
 
     len = sizeof(client);
     memset(&client, 0, sizeof(client));
 
     while (1) {
-        c = accept(s, (struct sockaddr *) &client, &len);
+        c = accept(sockfd, (struct sockaddr *) &client, &len);
         if (c < 0) {
             error(logger, "Could not accept connection");
         }
