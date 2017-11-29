@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
     cout << "Sending file " << path << " of size " << buffer.st_size << "\n";
 
     path_len = static_cast<int>(strlen(path)); // am verificat ca path-ul nu e mai lung de 260
-    packet_number = static_cast<uint32_t>(ceil(buffer.st_size / FILE_PART_SIZE));
+    packet_number = static_cast<uint32_t>(ceil(buffer.st_size / FILE_PART_SIZE)) + 1;
     translated = htonl(packet_number);
     cout << "packet number " << packet_number << "->" << htonl(packet_number) << endl;
 
@@ -132,6 +132,9 @@ int main(int argc, char **argv) {
         if (bytesRead == -1) {
             perror("Failed to read file: ");
             return 0;
+        }
+        if (bytesRead == 0) {
+            continue;
         }
 
         cout << "bytes read " << bytesRead << "->" << htonl(bytesRead) << endl;

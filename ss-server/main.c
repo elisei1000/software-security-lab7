@@ -15,18 +15,22 @@ file_logger *logger;
 const int MAX_PATH_SIZE = 260;
 const int MAX_PACKET_SIZE = 1024 * 1024;
 const int MAX_MSG = 1000;
-const char *restrincted_file_names = {
-        ""
-};
+const char *reserved_files[] = {"con", "prn", "aux", "nul", "com1", "com2", "com3", "com4", "com5",
+                                "com6", "com7", "com8", "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5",
+                                "lpt6", "lpt7", "lpt8", "lpt9"};
+const int RESERVED_FILES_SIZE = 22;
 
 void *to_lower(char *p) {
     if (*p) {
-        tolower(*p);
+        *p = (char) tolower(*p);
         to_lower(++p);
     }
 }
 
 bool is_path_valid(const char *path) {
+    if (strstr(path, "..") != NULL)
+        return false;
+
     size_t path_len = strlen(path);
     if (path_len > MAX_PATH_SIZE && path_len <= 2) {
         return false;
@@ -38,18 +42,15 @@ bool is_path_valid(const char *path) {
     info(logger, path);
     info(logger, lower_path);
     to_lower(lower_path);
-
-    for (size_t i = 0; i < path_len - 1; ++i) {
-        if (path[i] == '.' && path[i + 1] == '.') {
-            // tying to access parent directory
+    for (int i = 0; i < RESERVED_FILES_SIZE; i++)
+        if (strcmp(lower_path, reserved_files[i]) == 0) {
             is_valid = false;
-            break;
         }
-    }
 
     free(lower_path);
     return is_valid;
 }
+
 
 FILE *open_if_valid(const char *path) {
     if (is_path_valid(path)) {
@@ -69,49 +70,47 @@ void write_packet(FILE *fp, const char *packet, uint32_t realSize) {
 
 void serve_client(int c) {
     char msg[MAX_MSG];
-    uint32_t packetsCount, pathSize;
+    uint32_t packets_count, path_size;
     char packet[MAX_PACKET_SIZE];
     char path[MAX_PATH_SIZE];
 
-//    recv(c, msg, 10, MSG_WAITALL);
-//    debug(logger, msg);
+    recv(c, &packets_count, sizeof(packets_count), MSG_WAITALL);
+    snprintf(msg, MAX_MSG, "Packets count: %d -> %d", packets_count, ntohl(packets_count));
 
-
-    recv(c, &packetsCount, sizeof(packetsCount), MSG_WAITALL);
-    snprintf(msg, MAX_MSG, "Packets count: %d -> %d", packetsCount, ntohl(packetsCount));
-
-    packetsCount = ntohl(packetsCount);
+    packets_count = ntohl(packets_count);
     info(logger, msg);
 
-    recv(c, &pathSize, sizeof(pathSize), MSG_WAITALL);
-    snprintf(msg, MAX_MSG, "Path length before conversion: %d", pathSize);
+    recv(c, &path_size, sizeof(path_size), MSG_WAITALL);
+    snprintf(msg, MAX_MSG, "Path length before conversion: %d", path_size);
     info(logger, msg);
-    pathSize = ntohl(pathSize);
-    snprintf(msg, MAX_MSG, "Path length after conversion: %d", pathSize);
+    path_size = ntohl(path_size);
+    snprintf(msg, MAX_MSG, "Path length after conversion: %d", path_size);
     info(logger, msg);
 
     memset(path, '\0', MAX_PATH_SIZE * sizeof(char));
-    recv(c, path, pathSize * sizeof(char), MSG_WAITALL);
+    // make sure the allocated size is not exceeded
+    path_size = path_size > MAX_PATH_SIZE ? MAX_PATH_SIZE : path_size;
+    recv(c, path, path_size * sizeof(char), MSG_WAITALL);
     snprintf(msg, MAX_MSG, "Received path '%s'", path);
     debug(logger, msg);
     FILE *fp = open_if_valid(path);
 
-    for (int i = 0; i < packetsCount; i++) {
-        uint32_t realSize = 0;
-        recv(c, &realSize, sizeof(realSize), MSG_WAITALL);
-        snprintf(msg, MAX_MSG, "Packet's %d size before conversion: %d", i, realSize);
+    for (int i = 0; i < packets_count; i++) {
+        uint32_t real_size = 0;
+        recv(c, &real_size, sizeof(real_size), MSG_WAITALL);
+        snprintf(msg, MAX_MSG, "Packet's %d size before conversion: %d", i, real_size);
         debug(logger, msg);
-        realSize = ntohl(realSize);
+        real_size = ntohl(real_size);
 
-        snprintf(msg, MAX_MSG, "Packet's %d real size: %d", i, realSize);
+        snprintf(msg, MAX_MSG, "Packet's %d real size: %d", i, real_size);
         debug(logger, msg);
-        if (realSize > 0) {
+        if (real_size > 0) {
             memset(packet, '\0', MAX_PACKET_SIZE * sizeof(char));
-            recv(c, packet, realSize * sizeof(char), MSG_WAITALL);
+            recv(c, packet, real_size * sizeof(char), MSG_WAITALL);
             snprintf(msg, MAX_MSG, "Packet %d = '%s'", i, packet);
             debug(logger, msg);
 
-            write_packet(fp, packet, realSize);
+            write_packet(fp, packet, real_size);
         } else {
             snprintf(msg, MAX_MSG, "Packet size is 0, proceeding...");
             debug(logger, msg);
