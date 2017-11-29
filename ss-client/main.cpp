@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 
     cout << "Sending packets...\n";
 
-    for (int i = 0; i < packet_number; i++) {
+    for (int i = 0; i < packet_number; ++i) {
         cout << "Sending packet #" << i << "\n";
         memset(file_packet, '\0', FILE_PART_SIZE);
         uint32_t bytesRead = static_cast<uint32_t>(pread(input_fd, file_packet, FILE_PART_SIZE, FILE_PART_SIZE * i));
