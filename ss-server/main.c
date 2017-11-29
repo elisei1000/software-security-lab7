@@ -39,13 +39,41 @@ bool is_path_valid(const char *path) {
     char *lower_path = malloc((path_len + 1) * sizeof(char));
     bool is_valid = true;
     strcpy(lower_path, path);
+    lower_path[path_len] = '\0';
     info(logger, path);
     info(logger, lower_path);
     to_lower(lower_path);
-    for (int i = 0; i < RESERVED_FILES_SIZE; i++)
-        if (strcmp(lower_path, reserved_files[i]) == 0) {
-            is_valid = false;
+    info(logger, "Next is lowered path");
+    info(logger, lower_path);
+
+    // allow only letters, numbers, '.', '-', '_' and '/'
+    // allow maximum one dot
+    int dot_count = 0;
+    for (int i = 0; i < path_len; ++i) {
+        if (lower_path[i] >= 'a' && lower_path[i] <= 'z') continue;
+        if (lower_path[i] >= '0' && lower_path[i] <= '9') continue;
+        if (lower_path[i] == '/') continue;
+        if (lower_path[i] == '-') continue;
+        if (lower_path[i] == '_') continue;
+        if (lower_path[i] == '.' && dot_count == 0) {
+            dot_count++;
+            continue;
         }
+
+        printf("Invalid file, reason: '%c' (originally '%c') at offset %d\n", lower_path[i], path[i], i);
+        is_valid = false;
+        break;
+    }
+    if (is_valid) {
+        for (int i = 0; i < RESERVED_FILES_SIZE; i++) {
+            if (strcmp(lower_path, reserved_files[i]) == 0) {
+                printf("Invalid file, reason: '%s'\n", reserved_files[i]);
+                is_valid = false;
+                break;
+            }
+        }
+    }
+
 
     free(lower_path);
     return is_valid;
@@ -118,7 +146,7 @@ void serve_client(int c) {
 
     }
 
-    if (!is_path_valid(packet)) {
+    if (!is_path_valid(path)) {
         snprintf(msg, MAX_MSG, "Error: Path \"%s\" is invalid", path);
     } else {
         snprintf(msg, MAX_MSG, "Success");
@@ -168,8 +196,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     int enable = 1;
-    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
         error(logger, "setsockopt(SO_REUSEADDR) failed");
+    }
 
     for (int i = 0; i < argc; i++) {
         snprintf(msg, MAX_MSG, "arg[%d] = %s", i, argv[i]);
